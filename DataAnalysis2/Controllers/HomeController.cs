@@ -46,7 +46,6 @@ namespace DataAnalysis2.Controllers
             }
             catch(Exception ex)
             {
-                ViewBag.ex = ex;
                 //没成功就留在upload页面了
                 return View();
             }
