@@ -4,7 +4,7 @@
     //TODO B
 }
  @if (ViewBag.ex != null) {
-     <div> ViewBag.ex</div>
+     <div> @ViewBag.ex</div>
  }
  <div   style="margin-top:150px;text-align:center">
      @using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
