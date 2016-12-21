@@ -39,8 +39,8 @@ namespace DataAnalysis2.Controllers
             var fileName = Path.Combine(Request.MapPath("~/Upload"), "data.xlsx");
            try
            {
-                //file.SaveAs(fileName);
-                ExcelUtility.WriteSteamToFile(file.InputStream, fileName);
+                file.SaveAs(fileName);
+                ExcelUtility.WriteSteamToFile(ExcelUtility.RenderDataTableToExcel(ExcelUtility.ProcessData(fileName)), fileName);
 
                 return RedirectToAction("detail",new { group = 0 });
             }
