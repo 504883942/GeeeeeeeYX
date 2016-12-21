@@ -1,0 +1,232 @@
+﻿@model IEnumerable<DataAnalysis2.Models.DataClass>
+@using DataAnalysis2.Models;
+@{
+    ViewBag.Title = "Detail";
+    List<DataClass> data = ViewBag.Data;
+ 
+}
+
+
+@if (ViewBag.current == ViewBag.length - 1)
+{
+    <h2 class="col-md-10">整体测量数据</h2>
+}
+else
+{
+    <h2 class="col-md-10">第 @(ViewBag.current + 1) 组测量数据</h2>
+}
+
+<p><a class="btn btn-primary btn-lg col-md-2" href="/home/detail?group=@(ViewBag.length-1)" role="button" style="margin-top:15px">整体数据处理结果</a></p>
+<nav>
+    <ul class="pagination">
+  @for (var i = 0; i < ViewBag.length-1; i++)
+  {
+        <li class="@(i==ViewBag.current?"active":"")"><a  href="/home/detail?group=@i">@(1+i)</a></li>
+  }
+    </ul>
+</nav>
+
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" role="tab" data-toggle="tab">处理结果</a></li>
+    <li role="presentation"><a href="#profile" role="tab" data-toggle="tab">原始数据</a></li>
+ 
+</ul>
+<hr />
+<!-- Tab panes -->
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="home">
+       
+            <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+            <div id="main" style=" height:500px;"></div>
+          
+     
+                <div class="bs-callout bs-callout-primary  ">
+                    <dl class="dl-horizontal ">
+                        <dt>拟合回归直线方程</dt>
+                        <dd>@ViewBag.Expression</dd>
+                    </dl>
+                </div>
+                <div class="bs-callout bs-callout-warning  ">
+                    <dl class="dl-horizontal ">
+                        <dt>线性度</dt>
+                        <dd>@ViewBag.xxd</dd>
+                        <dt>灵敏度</dt>
+                        <dd>@ViewBag.lmd</dd>
+                        <dt>迟滞</dt>
+                        <dd>@ViewBag.cz</dd>
+                        @if (ViewBag.current == ViewBag.length - 1)
+                        {
+                            <dt>重复性(系数取2)</dt>
+                            <dd>@ViewBag.cfx</dd>
+                        }
+                        
+                    </dl>
+                </div>
+                <div class="bs-callout bs-callout-danger  ">
+                    <dt>方差分析</dt>
+                    <div class="table-responsive" style="margin-top:10px">
+                        <table class="table table-bordered ">
+                            
+                            <tr>
+                                <th>来源</th>
+                                <th>平方和</th>
+                                <th>自由度</th>
+                                <th>方差</th>
+                                <th>F</th>
+                            </tr>
+                            <tr>
+                                <td>回归</td>
+                                <td>@ViewBag.a11</td>
+                                <td>@ViewBag.a12</td>
+                                <td>@ViewBag.a13</td>
+                                <td>@ViewBag.a14</td>
+                            </tr>
+                            <tr>
+                                <td>残余</td>
+                                <td>@ViewBag.a21</td>
+                                <td>@ViewBag.a22</td>
+                                <td>@ViewBag.a23</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>总计</td>
+                                <td>@ViewBag.a31</td>
+                                <td>@ViewBag.a32</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                    </div>
+                </div>
+
+        
+
+        </div>
+ 
+    <div role="tabpanel" class="tab-pane" id="profile">
+        <div class="table-responsive   " style="margin-top:10px">
+
+            <table class="table table-bordered ">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.DisplayNameFor(model => model.Distance)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.ZV)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.FV)
+                        </th>
+             
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+            {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Distance)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ZV)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FV)
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="~/Scripts/echarts.js"></script>
+<script type="text/javascript">
+    // 基于准备好的dom，初始化echarts实例
+    var myChart = echarts.init(document.getElementById('main'));
+
+    var dataAll = [
+        [
+            @Html.Raw(String.Join(",", data.Select(p => "[" + p.Distance + "," + p.ZV + "]").ToList()))
+
+        ],
+        [
+            @Html.Raw(String.Join(",", data.Select(p => "[" + p.Distance + "," + p.FV + "]").ToList()))
+        ]
+    ];
+
+    var markLineOpt = {
+        animation: false,
+        label: {
+            normal: {
+                formatter: "@ViewBag.Expression",
+                textStyle: {
+                    align: 'right'
+                }
+            }
+        },
+        lineStyle: {
+            normal: {
+                type: 'solid'
+            }
+        },
+        tooltip: {
+            formatter: "@ViewBag.Expression"
+        },
+        data: [[{
+            coord: [@ViewBag.x1, @ViewBag.y1],
+            symbol: 'none'
+        }, {
+            coord: [@ViewBag.x2, @ViewBag.y2],
+            symbol: 'none'
+        }]]
+    };
+
+    option = {
+        title: {
+            text: '散点图',
+
+        },
+
+        tooltip: {
+
+        },
+        legend: {
+            data: ["正行程", "反行程"]
+        },
+        xAxis: [
+            { min: 0, max: 7 },
+
+        ],
+        yAxis: [
+            { min: 600, max: 1400 },
+
+        ],
+        series: [
+            {
+                name: '正行程',
+                type: 'scatter',
+                data: dataAll[0],
+                markLine: markLineOpt
+            }, {
+                name: '反行程',
+                type: 'scatter',
+                data: dataAll[1],
+                markLine: markLineOpt
+            }
+
+        ]
+    };
+
+    // 使用刚指定的配置项和数据显示图表。
+    myChart.setOption(option);
+</script>
+

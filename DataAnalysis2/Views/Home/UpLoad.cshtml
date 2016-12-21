@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewBag.Title = "UpLoad";
+    //TODO B
+}
+ 
+ <div   style="margin-top:150px;text-align:center">
+     @using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+     {
+         <div class="col-lg-12">
+             <h2>请选择EXCEL文件</h2>
+             <div>
+                 <input type="file" name="file" class="form-control  " />
+             </div><!-- /input-group -->
+             <input id="ButtonUpload" class="btn btn-primary btn-lg" type="submit" value="提交" style="margin-top:5px" /> 
+         </div>
+     }
+ </div>
